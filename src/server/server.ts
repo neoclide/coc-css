@@ -118,7 +118,33 @@ connection.onDidChangeConfiguration(change => {
 
 function updateConfiguration(settings: Settings) {
   for (const languageId in languageServices) {
-    languageServices[languageId].configure((settings as any)[languageId])
+    let setting = (settings as any)[languageId]
+    setting = Object.assign({
+      validate: true,
+      lint: {
+        argumentsInColorFunction: 'error',
+        boxModel: 'warning',
+        compatibleVendorPrefixes: 'ignore',
+        duplicateProperties: 'error',
+        emptyRules: 'warning',
+        float: 'warning',
+        fontFaceProperties: 'warning',
+        hexColorLength: 'error',
+        idSelector: 'ignore',
+        ieHack: 'ignore',
+        important: 'ignore',
+        importStatement: 'warning',
+        propertyIgnoredDueToDisplay: 'warning',
+        universalSelector: 'ignore',
+        unknownAtRules: 'warning',
+        unknownProperties: 'warning',
+        unknownVendorSpecificProperties: 'warning',
+        vendorPrefix: 'warning',
+        zeroUnits: 'ignore'
+      }
+    }, setting)
+    settings[languageId] = setting
+    languageServices[languageId].configure(setting)
   }
   // reset all document settings
   documentSettings = Object.assign({}, settings)

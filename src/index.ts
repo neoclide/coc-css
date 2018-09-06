@@ -4,7 +4,7 @@ import { ProviderResult } from 'coc.nvim/lib/provider'
 
 export async function activate(context: ExtensionContext): Promise<void> {
   let { subscriptions } = context
-  const config = workspace.getConfiguration().get('css') as any
+  const config = workspace.getConfiguration().get('css', {}) as any
   const enable = config.enable
   if (enable === false) return
   const file = context.asAbsolutePath('./lib/server/server.js')
