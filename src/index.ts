@@ -7,7 +7,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
   const config = workspace.getConfiguration().get('css', {}) as any
   const enable = config.enable
   if (enable === false) return
-  const file = context.asAbsolutePath('./lib/server/server.js')
+  const file = context.asAbsolutePath('./lib/server/cssServerMain.js')
   const selector = config.filetypes || ['css', 'less', 'scss', 'wxss']
 
   let serverOptions: ServerOptions = {
