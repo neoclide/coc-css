@@ -5,10 +5,9 @@ import { ProviderResult } from 'coc.nvim/lib/provider'
 export async function activate(context: ExtensionContext): Promise<void> {
   let { subscriptions } = context
   const config = workspace.getConfiguration().get('css', {}) as any
-  const enable = config.enable
-  if (enable === false) return
+  if (!config.enable) return
   const file = context.asAbsolutePath('./lib/server/cssServerMain.js')
-  const selector = config.filetypes || ['css', 'less', 'scss', 'wxss']
+  const selector = ['css', 'less', 'scss', 'wxss']
 
   let serverOptions: ServerOptions = {
     module: file,
@@ -57,7 +56,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   }
 
-  let client = new LanguageClient('css', 'css langserver', serverOptions, clientOptions)
+  let client = new LanguageClient('css', 'Css language server', serverOptions, clientOptions)
 
   subscriptions.push(
     services.registLanguageClient(client)

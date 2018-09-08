@@ -12,23 +12,17 @@
     "build": "tsc -p tsconfig.json",
     "prepare": "yarn clean && yarn build"
   },
+  "activationEvents": [
+    "onLanguage:css",
+    "onLanguage:less",
+    "onLanguage:scss",
+    "onLanguage:wxss"
+  ],
   "contributes": {
     "configuration": {
       "type": "object",
       "title": "Css",
       "properties": {
-        "css.filetypes": {
-          "type": "array",
-          "default": [
-            "css",
-            "scss",
-            "less",
-            "wxss"
-          ],
-          "items": {
-            "type": "string"
-          }
-        },
         "css.trace.server": {
           "type": "string",
           "default": "off",
