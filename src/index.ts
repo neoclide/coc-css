@@ -64,9 +64,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 }
 
 function fixItem(item: CompletionItem): void {
-  item.data = item.data || {}
-  item.data.abbr = item.label
-  item.label = item.label.slice(1)
+  item.insertText = item.label.slice(1) // tslint:disable-line
   item.textEdit = null
   item.insertTextFormat = InsertTextFormat.PlainText
 }
