@@ -1,5 +1,5 @@
 import { ExtensionContext, LanguageClient, ServerOptions, workspace, services, TransportKind, LanguageClientOptions, ProvideCompletionItemsSignature } from 'coc.nvim'
-import { TextDocument, Position, CompletionContext, CancellationToken, CompletionItem, CompletionList, InsertTextFormat } from 'vscode-languageserver-protocol'
+import { TextDocument, Position, CompletionContext, CancellationToken, CompletionItem, CompletionList, InsertTextFormat, CompletionTriggerKind } from 'vscode-languageserver-protocol'
 import { ProviderResult } from 'coc.nvim/lib/provider'
 
 export async function activate(context: ExtensionContext): Promise<void> {
@@ -38,6 +38,11 @@ export async function activate(context: ExtensionContext): Promise<void> {
           let doc = workspace.getDocument(document.uri)
           if (!doc) return []
           let items: CompletionItem[] = res.hasOwnProperty('isIncomplete') ? (res as CompletionList).items : res as CompletionItem[]
+          let option = (context as any).option
+          if (context.triggerKind == CompletionTriggerKind.Invoked && option.input) {
+            let character = option.input[0]
+            items = items.filter(o => o.label.startsWith(character))
+          }
           let pre = doc.getline(position.line).slice(0, position.character)
           // searching for class name
           if (/(^|\s)\.\w*$/.test(pre)) {
