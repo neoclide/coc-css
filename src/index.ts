@@ -1,6 +1,7 @@
 import { ExtensionContext, LanguageClient, ServerOptions, workspace, services, TransportKind, LanguageClientOptions, ProvideCompletionItemsSignature } from 'coc.nvim'
 import { TextDocument, Position, CompletionContext, CancellationToken, CompletionItem, CompletionList, InsertTextFormat, CompletionTriggerKind } from 'vscode-languageserver-protocol'
 import { ProviderResult } from 'coc.nvim/lib/provider'
+import { getCustomDataPathsInAllWorkspaces, getCustomDataPathsFromAllExtensions } from './customData'
 
 export async function activate(context: ExtensionContext): Promise<void> {
   let { subscriptions } = context
@@ -19,13 +20,20 @@ export async function activate(context: ExtensionContext): Promise<void> {
     }
   }
 
+  let dataPaths = [
+    ...getCustomDataPathsInAllWorkspaces(),
+    ...getCustomDataPathsFromAllExtensions()
+  ]
+
   let clientOptions: LanguageClientOptions = {
     documentSelector: selector,
     synchronize: {
       configurationSection: ['css', 'less', 'scss', 'wxss']
     },
     outputChannelName: 'css',
-    initializationOptions: config.initializationOptions || {},
+    initializationOptions: {
+      dataPaths
+    },
     middleware: {
       provideCompletionItem: (
         document: TextDocument,
