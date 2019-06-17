@@ -1,11 +1,10 @@
 import { ExtensionContext, LanguageClient, ServerOptions, workspace, services, TransportKind, LanguageClientOptions, ProvideCompletionItemsSignature } from 'coc.nvim'
 import { TextDocument, Position, CompletionContext, CancellationToken, CompletionItem, CompletionList, InsertTextFormat, CompletionTriggerKind } from 'vscode-languageserver-protocol'
-import { ProviderResult } from 'coc.nvim/lib/provider'
 import { getCustomDataPathsInAllWorkspaces, getCustomDataPathsFromAllExtensions } from './customData'
 
 export async function activate(context: ExtensionContext): Promise<void> {
   let { subscriptions } = context
-  const config = workspace.getConfiguration().get('css', {}) as any
+  const config = workspace.getConfiguration().get<any>('css', {}) as any
   if (!config.enable) return
   const file = context.asAbsolutePath('./lib/server/cssServerMain.js')
   const selector = ['css', 'less', 'scss', 'wxss']
@@ -41,7 +40,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
         context: CompletionContext,
         token: CancellationToken,
         next: ProvideCompletionItemsSignature
-      ): ProviderResult<CompletionItem[] | CompletionList> => {
+      ) => {
         return Promise.resolve(next(document, position, context, token)).then((res: CompletionItem[] | CompletionList) => {
           let doc = workspace.getDocument(document.uri)
           if (!doc) return []
