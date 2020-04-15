@@ -1,6 +1,6 @@
 {
   "name": "coc-css",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Css extension for coc",
   "main": "lib/index.js",
   "publisher": "chemzqm",
