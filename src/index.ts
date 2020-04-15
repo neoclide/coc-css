@@ -34,38 +34,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
       dataPaths
     },
     middleware: {
-      provideCompletionItem: (
-        document: TextDocument,
-        position: Position,
-        context: CompletionContext,
-        token: CancellationToken,
-        next: ProvideCompletionItemsSignature
-      ) => {
-        return Promise.resolve(next(document, position, context, token)).then((res: CompletionItem[] | CompletionList) => {
-          let doc = workspace.getDocument(document.uri)
-          if (!doc) return []
-          let items: CompletionItem[] = res.hasOwnProperty('isIncomplete') ? (res as CompletionList).items : res as CompletionItem[]
-          let option = (context as any).option
-          if (context.triggerKind == CompletionTriggerKind.Invoked && option.input) {
-            let character = option.input[0]
-            items = items.filter(o => o.label.startsWith(character))
-          }
-          let pre = doc.getline(position.line).slice(0, position.character)
-          // searching for class name
-          if (/(^|\s)\.\w*$/.test(pre)) {
-            items = items.filter(o => o.label.startsWith('.'))
-            items.forEach(fixItem)
-          }
-          if (context.triggerCharacter == ':'
-            || /\:\w*$/.test(pre)) {
-            items = items.filter(o => o.label.startsWith(':'))
-            items.forEach(fixItem)
-          }
-          return items
-        })
-      }
     }
-
   }
 
   let client = new LanguageClient('css', 'Css language server', serverOptions, clientOptions)
@@ -73,10 +42,4 @@ export async function activate(context: ExtensionContext): Promise<void> {
   subscriptions.push(
     services.registLanguageClient(client)
   )
-}
-
-function fixItem(item: CompletionItem): void {
-  item.insertText = item.label.slice(1) // tslint:disable-line
-  item.textEdit = null
-  item.insertTextFormat = InsertTextFormat.PlainText
 }
