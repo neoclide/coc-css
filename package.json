@@ -40,6 +40,27 @@
             "verbose"
           ]
         },
+        "css.customData": {
+          "type": "array",
+          "markdownDescription": "A list of relative file paths pointing to JSON files following the [custom data format](https://github.com/Microsoft/vscode-css-languageservice/blob/master/docs/customData.md).\n\ncoc.nvim loads custom data on startup to enhance its CSS support for the custom CSS properties, at directives, pseudo classes and pseudo elements you specify in the JSON files.\n\nThe file paths are relative to workspace and only workspace folder settings are considered.",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "scope": "resource"
+        },
+        "css.completion.triggerPropertyValueCompletion": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "By default, coc.nvim triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
+        },
+        "css.completion.completePropertyWithSemicolon": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Insert semicolon at end of line when completing CSS properties"
+        },
         "css.validate": {
           "type": "boolean",
           "scope": "resource",
@@ -256,6 +277,18 @@
           "default": "warning",
           "description": "Unknown at-rule."
         },
+        "less.completion.triggerPropertyValueCompletion": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "By default, coc.nvim triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
+        },
+        "less.completion.completePropertyWithSemicolon": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Insert semicolon at end of line when completing CSS properties"
+        },
         "less.validate": {
           "type": "boolean",
           "scope": "resource",
@@ -471,6 +504,18 @@
           ],
           "default": "warning",
           "description": "Unknown at-rule."
+        },
+        "scss.completion.triggerPropertyValueCompletion": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "By default, coc.nvim triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
+        },
+        "scss.completion.completePropertyWithSemicolon": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Insert semicolon at end of line when completing CSS properties"
         },
         "scss.validate": {
           "type": "boolean",
