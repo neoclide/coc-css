@@ -3,59 +3,84 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import * as path from 'path'
-import { Uri, workspace, extensions } from 'coc.nvim'
+import {Disposable, extensions, Uri, workspace} from 'coc.nvim'
+import path from 'path'
+import {Emitter} from 'vscode-languageserver-protocol'
+import {resolvePath} from './requests'
 
-interface ExperimentalConfig {
-  experimental?: {
-    customData?: string[]
+export function getCustomDataSource(toDispose: Disposable[]): any {
+  let pathsInWorkspace = getCustomDataPathsInAllWorkspaces()
+  let pathsInExtensions = getCustomDataPathsFromAllExtensions()
+
+  const onChange = new Emitter<void>()
+
+  toDispose.push(extensions.onDidActiveExtension(_ => {
+    const newPathsInExtensions = getCustomDataPathsFromAllExtensions()
+    if (newPathsInExtensions.length !== pathsInExtensions.length || !newPathsInExtensions.every((val, idx) => val === pathsInExtensions[idx])) {
+      pathsInExtensions = newPathsInExtensions
+      onChange.fire()
+    }
+  }))
+  toDispose.push(workspace.onDidChangeConfiguration(e => {
+    if (e.affectsConfiguration('css.customData')) {
+      pathsInWorkspace = getCustomDataPathsInAllWorkspaces()
+      onChange.fire()
+    }
+  }))
+
+  return {
+    get uris() {
+      return pathsInWorkspace.concat(pathsInExtensions)
+    },
+    get onDidChange() {
+      return onChange.event
+    }
   }
 }
 
-export function getCustomDataPathsInAllWorkspaces(): string[] {
+function getCustomDataPathsInAllWorkspaces(): string[] {
+  const workspaceFolders = workspace.workspaceFolders
+
   const dataPaths: string[] = []
-  let workspaceFolders = workspace.workspaceFolders
 
   if (!workspaceFolders) {
     return dataPaths
   }
 
-  workspaceFolders.forEach(wf => {
-    const allCssConfig = workspace.getConfiguration(undefined, wf.uri)
-    const wfCSSConfig = allCssConfig.inspect<ExperimentalConfig>('css') as any
-    if (
-      wfCSSConfig &&
-      wfCSSConfig.workspaceFolderValue &&
-      wfCSSConfig.workspaceFolderValue.experimental &&
-      wfCSSConfig.workspaceFolderValue.experimental.customData
-    ) {
-      const customData = wfCSSConfig.workspaceFolderValue.experimental.customData
-      if (Array.isArray(customData)) {
-        customData.forEach(t => {
-          if (typeof t === 'string') {
-            dataPaths.push(path.resolve(Uri.parse(wf.uri).fsPath, t))
-          }
-        })
+  const collect = (paths: string[] | undefined, rootFolder: Uri) => {
+    if (Array.isArray(paths)) {
+      for (const path of paths) {
+        if (typeof path === 'string') {
+          dataPaths.push(resolvePath(rootFolder, path).toString())
+        }
       }
-    }
-  })
-
-  return dataPaths
-}
-
-export function getCustomDataPathsFromAllExtensions(): string[] {
-  const dataPaths: string[] = []
-
-  for (const extension of extensions.all) {
-    const contributes = extension.packageJSON && extension.packageJSON.contributes
-
-    if (contributes && contributes.css && contributes.css.experimental.customData && Array.isArray(contributes.css.experimental.customData)) {
-      const relativePaths: string[] = contributes.css.experimental.customData
-      relativePaths.forEach(rp => {
-        dataPaths.push(path.resolve(extension.extensionPath, rp))
-      })
     }
   }
 
+  for (let i = 0; i < workspaceFolders.length; i++) {
+    const folderUri = workspaceFolders[i].uri
+    const allCssConfig = workspace.getConfiguration('css', folderUri)
+    const customDataInspect = allCssConfig.inspect<string[]>('customData')
+    if (customDataInspect) {
+      collect(customDataInspect.workspaceValue, Uri.parse(folderUri))
+      if (i === 0) {
+        collect(customDataInspect.globalValue, Uri.parse(folderUri))
+      }
+    }
+
+  }
+  return dataPaths
+}
+
+function getCustomDataPathsFromAllExtensions(): string[] {
+  const dataPaths: string[] = []
+  for (const extension of extensions.all) {
+    const customData = extension.packageJSON?.contributes?.css?.customData
+    if (Array.isArray(customData)) {
+      for (const rp of customData) {
+        dataPaths.push(path.join(extension.extensionPath, rp).toString())
+      }
+    }
+  }
   return dataPaths
 }

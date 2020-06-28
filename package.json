@@ -862,18 +862,18 @@
   "devDependencies": {
     "@chemzqm/tsconfig": "^0.0.3",
     "@chemzqm/tslint-config": "^1.0.18",
-    "@types/node": "^12.0.8",
-    "coc.nvim": "^0.0.71",
-    "rimraf": "^2.6.3",
-    "ts-loader": "^6.0.3",
-    "tslint": "^5.17.0",
-    "typescript": "^3.5.2",
-    "vscode-css-languageservice": "^4.0.2",
-    "vscode-languageserver": "^5.3.0-next.8",
-    "vscode-languageserver-protocol": "^3.15.0-next.6",
-    "vscode-uri": "^2.0.2",
-    "webpack": "^4.34.0",
-    "webpack-cli": "^3.3.4"
+    "@types/node": "^14.0.13",
+    "coc.nvim": "^0.0.77",
+    "rimraf": "^3.0.2",
+    "ts-loader": "^7.0.5",
+    "tslint": "^6.1.2",
+    "typescript": "^3.9.5",
+    "vscode-css-languageservice": "4.3.0-next.3",
+    "vscode-languageserver": "7.0.0-next.3",
+    "vscode-languageserver-protocol": "^3.15.3",
+    "vscode-uri": "^2.1.2",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11"
   },
   "dependencies": {}
 }
