@@ -1,5 +1,5 @@
 # coc-css
-
+An amazing project
 Css language server extension for [coc.nvim](https://github.com/neoclide/coc.nvim).
 
 Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice) inside.
