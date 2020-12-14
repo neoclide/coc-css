@@ -1,13 +1,12 @@
-import {ExtensionContext, LanguageClient, LanguageClientOptions, ServerOptions, services, TransportKind, workspace} from 'coc.nvim'
-import {getCustomDataSource} from './customData'
-import {NotificationType} from 'vscode-languageserver-protocol'
+import { ExtensionContext, NotificationType, LanguageClient, LanguageClientOptions, ServerOptions, services, TransportKind, workspace } from 'coc.nvim'
+import { getCustomDataSource } from './customData'
 
 namespace CustomDataChangedNotification {
   export const type: NotificationType<string[]> = new NotificationType('css/customDataChanged')
 }
 
 export async function activate(context: ExtensionContext): Promise<void> {
-  let {subscriptions} = context
+  let { subscriptions } = context
   const config = workspace.getConfiguration().get<any>('css', {}) as any
   if (!config.enable) return
   const file = context.asAbsolutePath('./lib/server.js')

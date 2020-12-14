@@ -3,10 +3,9 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import {Disposable, extensions, Uri, workspace} from 'coc.nvim'
+import { Disposable, Emitter, extensions, Uri, workspace } from 'coc.nvim'
 import path from 'path'
-import {Emitter} from 'vscode-languageserver-protocol'
-import {resolvePath} from './requests'
+import { resolvePath } from './requests'
 
 export function getCustomDataSource(toDispose: Disposable[]): any {
   let pathsInWorkspace = getCustomDataPathsInAllWorkspaces()
