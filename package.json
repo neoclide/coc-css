@@ -910,9 +910,9 @@
     "rimraf": "^3.0.2",
     "ts-loader": "^8.0.7",
     "typescript": "^4.0.5",
-    "vscode-css-languageservice": "4.3.5",
-    "vscode-languageserver": "7.0.0-next.3",
-    "vscode-uri": "^2.1.2",
+    "vscode-css-languageservice": "5.1.8",
+    "vscode-languageserver": "7.0.0",
+    "vscode-uri": "^3.0.2",
     "webpack": "^5.2.0",
     "webpack-cli": "^4.1.0"
   },
