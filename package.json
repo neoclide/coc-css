@@ -33,16 +33,18 @@
         },
         "css.trace.server": {
           "type": "string",
-          "default": "off",
+          "scope": "window",
           "enum": [
             "off",
             "messages",
             "verbose"
-          ]
+          ],
+          "default": "off",
+          "description": "Traces the communication between VS Code and the CSS language server"
         },
         "css.customData": {
           "type": "array",
-          "markdownDescription": "A list of relative file paths pointing to JSON files following the [custom data format](https://github.com/Microsoft/vscode-css-languageservice/blob/master/docs/customData.md).\n\ncoc.nvim loads custom data on startup to enhance its CSS support for the custom CSS properties, at directives, pseudo classes and pseudo elements you specify in the JSON files.\n\nThe file paths are relative to workspace and only workspace folder settings are considered.",
+          "markdownDescription": "A list of relative file paths pointing to JSON files following the [custom data format](https://github.com/microsoft/vscode-css-languageservice/blob/master/docs/customData.md).\n\ncoc.nvim loads custom data on startup to enhance its CSS support for the custom CSS properties, at directives, pseudo classes and pseudo elements you specify in the JSON files.\n\nThe file paths are relative to workspace and only workspace folder settings are considered",
           "default": [],
           "items": {
             "type": "string"
@@ -53,7 +55,7 @@
           "type": "boolean",
           "scope": "resource",
           "default": true,
-          "description": "By default, coc.nvim triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
+          "description": "By default, coc.nvim triggers property value completion after selecting a CSS property. Use this setting to disable this behavior"
         },
         "css.completion.completePropertyWithSemicolon": {
           "type": "boolean",
@@ -64,12 +66,25 @@
         "css.validate": {
           "type": "boolean",
           "scope": "resource",
-          "default": true
+          "default": true,
+          "description": "Controls SCSS validation and problem severities"
         },
         "css.colorDecorators.enable": {
           "type": "boolean",
           "scope": "window",
           "default": true
+        },
+        "css.hover.documentation": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Show tag and attribute documentation in SCSS hovers"
+        },
+        "css.hover.references": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Show references to MDN in SCSS hovers"
         },
         "css.lint.compatibleVendorPrefixes": {
           "type": "string",
@@ -91,7 +106,7 @@
             "error"
           ],
           "default": "warning",
-          "description": "When using a vendor-specific prefix also include the standard property"
+          "description": "When using a vendor-specific prefix, also include the standard property"
         },
         "css.lint.duplicateProperties": {
           "type": "string",
@@ -124,7 +139,7 @@
             "error"
           ],
           "default": "ignore",
-          "description": "Avoid using !important. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored."
+          "description": "Import statements do not load in parallel"
         },
         "css.lint.boxModel": {
           "type": "string",
@@ -134,7 +149,8 @@
             "warning",
             "error"
           ],
-          "default": "ignore"
+          "default": "ignore",
+          "markdownDescription": "Do not use `width` or `height` when using `padding` or `border`"
         },
         "css.lint.universalSelector": {
           "type": "string",
@@ -145,7 +161,7 @@
             "error"
           ],
           "default": "ignore",
-          "description": "The universal selector (*) is known to be slow"
+          "markdownDescription": "The universal selector (`*`) is known to be slow"
         },
         "css.lint.zeroUnits": {
           "type": "string",
@@ -155,7 +171,8 @@
             "warning",
             "error"
           ],
-          "default": "ignore"
+          "default": "ignore",
+          "description": "No unit for zero needed"
         },
         "css.lint.fontFaceProperties": {
           "type": "string",
@@ -166,7 +183,7 @@
             "error"
           ],
           "default": "warning",
-          "description": "@font-face rule must define 'src' and 'font-family' properties"
+          "markdownDescription": "`@font-face` rule must define `src` and `font-family` properties"
         },
         "css.lint.hexColorLength": {
           "type": "string",
@@ -199,7 +216,17 @@
             "error"
           ],
           "default": "warning",
-          "description": "Unknown property."
+          "description": "Unknown property"
+        },
+        "css.lint.validProperties": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "scope": "resource",
+          "default": [],
+          "description": "A list of properties that are not validated against the `unknownProperties` rule"
         },
         "css.lint.ieHack": {
           "type": "string",
@@ -209,7 +236,8 @@
             "warning",
             "error"
           ],
-          "default": "ignore"
+          "default": "ignore",
+          "description": "IE hacks are only necessary when supporting IE7 and older"
         },
         "css.lint.unknownVendorSpecificProperties": {
           "type": "string",
@@ -220,7 +248,7 @@
             "error"
           ],
           "default": "ignore",
-          "description": "Unknown vendor specific property."
+          "description": "Unknown vendor specific property"
         },
         "css.lint.propertyIgnoredDueToDisplay": {
           "type": "string",
@@ -231,7 +259,7 @@
             "error"
           ],
           "default": "warning",
-          "description": "Property is ignored due to the display. E.g. with 'display: inline', the width, height, margin-top, margin-bottom, and float properties have no effect"
+          "markdownDescription": "Property is ignored due to the display. E.g. with `display: inline`, the `width`, `height`, `margin-top`, `margin-bottom`, and `float` properties have no effect"
         },
         "css.lint.important": {
           "type": "string",
@@ -242,7 +270,7 @@
             "error"
           ],
           "default": "ignore",
-          "description": "Import statements do not load in parallel"
+          "markdownDescription": "Avoid using `!important`. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored"
         },
         "css.lint.float": {
           "type": "string",
@@ -253,7 +281,7 @@
             "error"
           ],
           "default": "ignore",
-          "description": "Avoid using 'float'. Floats lead to fragile CSS that is easy to break if one aspect of the layout changes."
+          "markdownDescription": "Avoid using `float`. Floats lead to fragile CSS that is easy to break if one aspect of the layout changes"
         },
         "css.lint.idSelector": {
           "type": "string",
@@ -264,7 +292,7 @@
             "error"
           ],
           "default": "ignore",
-          "description": "Selectors should not contain IDs because these rules are too tightly coupled with the HTML."
+          "description": "Selectors should not contain IDs because these rules are too tightly coupled with the HTML"
         },
         "css.lint.unknownAtRules": {
           "type": "string",
@@ -275,13 +303,267 @@
             "error"
           ],
           "default": "warning",
-          "description": "Unknown at-rule."
+          "description": "Unknown at-rule"
+        },
+        "scss.completion.triggerPropertyValueCompletion": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "By default, coc.nvim triggers property value completion after selecting a CSS property. Use this setting to disable this behavior"
+        },
+        "scss.completion.completePropertyWithSemicolon": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Insert semicolon at end of line when completing CSS properties"
+        },
+        "scss.validate": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Controls SCSS validation and problem severities"
+        },
+        "scss.colorDecorators.enable": {
+          "type": "boolean",
+          "scope": "window",
+          "default": true
+        },
+        "scss.hover.documentation": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Show tag and attribute documentation in SCSS hovers"
+        },
+        "scss.hover.references": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Show references to MDN in SCSS hovers"
+        },
+        "scss.lint.compatibleVendorPrefixes": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "ignore",
+          "description": "When using a vendor-specific prefix make sure to also include all other vendor-specific properties"
+        },
+        "scss.lint.vendorPrefix": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "warning",
+          "description": "When using a vendor-specific prefix, also include the standard property"
+        },
+        "scss.lint.duplicateProperties": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "ignore",
+          "description": "Do not use duplicate style definitions"
+        },
+        "scss.lint.emptyRules": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "warning",
+          "description": "Do not use empty rulesets"
+        },
+        "scss.lint.importStatement": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "ignore",
+          "description": "Import statements do not load in parallel"
+        },
+        "scss.lint.boxModel": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "ignore",
+          "markdownDescription": "Do not use `width` or `height` when using `padding` or `border`"
+        },
+        "scss.lint.universalSelector": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "ignore",
+          "markdownDescription": "The universal selector (`*`) is known to be slow"
+        },
+        "scss.lint.zeroUnits": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "ignore",
+          "description": "No unit for zero needed"
+        },
+        "scss.lint.fontFaceProperties": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "warning",
+          "markdownDescription": "`@font-face` rule must define `src` and `font-family` properties"
+        },
+        "scss.lint.hexColorLength": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "error",
+          "description": "Hex colors must consist of three or six hex numbers"
+        },
+        "scss.lint.argumentsInColorFunction": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "error",
+          "description": "Invalid number of parameters"
+        },
+        "scss.lint.unknownProperties": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "warning",
+          "description": "Unknown property"
+        },
+        "scss.lint.validProperties": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "scope": "resource",
+          "default": [],
+          "description": "A list of properties that are not validated against the `unknownProperties` rule"
+        },
+        "scss.lint.ieHack": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "ignore",
+          "description": "IE hacks are only necessary when supporting IE7 and older"
+        },
+        "scss.lint.unknownVendorSpecificProperties": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "ignore",
+          "description": "Unknown vendor specific property"
+        },
+        "scss.lint.propertyIgnoredDueToDisplay": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "warning",
+          "markdownDescription": "Property is ignored due to the display. E.g. with `display: inline`, the `width`, `height`, `margin-top`, `margin-bottom`, and `float` properties have no effect"
+        },
+        "scss.lint.important": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "ignore",
+          "markdownDescription": "Avoid using `!important`. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored"
+        },
+        "scss.lint.float": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "ignore",
+          "markdownDescription": "Avoid using `float`. Floats lead to fragile CSS that is easy to break if one aspect of the layout changes"
+        },
+        "scss.lint.idSelector": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "ignore",
+          "description": "Selectors should not contain IDs because these rules are too tightly coupled with the HTML"
+        },
+        "scss.lint.unknownAtRules": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "warning",
+          "description": "Unknown at-rule"
         },
         "less.completion.triggerPropertyValueCompletion": {
           "type": "boolean",
           "scope": "resource",
           "default": true,
-          "description": "By default, coc.nvim triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
+          "description": "By default, coc.nvim triggers property value completion after selecting a CSS property. Use this setting to disable this behavior"
         },
         "less.completion.completePropertyWithSemicolon": {
           "type": "boolean",
@@ -292,12 +574,25 @@
         "less.validate": {
           "type": "boolean",
           "scope": "resource",
-          "default": true
+          "default": true,
+          "description": "Enables or disables all validations"
         },
         "less.colorDecorators.enable": {
           "type": "boolean",
           "scope": "window",
           "default": true
+        },
+        "less.hover.documentation": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Show tag and attribute documentation in LESS hovers"
+        },
+        "less.hover.references": {
+          "type": "boolean",
+          "scope": "resource",
+          "default": true,
+          "description": "Show references to MDN in LESS hovers"
         },
         "less.lint.compatibleVendorPrefixes": {
           "type": "string",
@@ -352,7 +647,7 @@
             "error"
           ],
           "default": "ignore",
-          "description": "Avoid using !important. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored."
+          "description": "Avoid using !important. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored"
         },
         "less.lint.boxModel": {
           "type": "string",
@@ -362,7 +657,8 @@
             "warning",
             "error"
           ],
-          "default": "ignore"
+          "default": "ignore",
+          "markdownDescription": "Do not use `width` or `height` when using `padding` or `border`"
         },
         "less.lint.universalSelector": {
           "type": "string",
@@ -373,7 +669,7 @@
             "error"
           ],
           "default": "ignore",
-          "description": "The universal selector (*) is known to be slow"
+          "markdownDescription": "The universal selector (`*`) is known to be slow"
         },
         "less.lint.zeroUnits": {
           "type": "string",
@@ -383,7 +679,8 @@
             "warning",
             "error"
           ],
-          "default": "ignore"
+          "default": "ignore",
+          "description": "No unit for zero needed"
         },
         "less.lint.fontFaceProperties": {
           "type": "string",
@@ -394,7 +691,7 @@
             "error"
           ],
           "default": "warning",
-          "description": "@font-face rule must define 'src' and 'font-family' properties"
+          "markdownDescription": "`@font-face` rule must define `src` and `font-family` properties"
         },
         "less.lint.hexColorLength": {
           "type": "string",
@@ -427,228 +724,19 @@
             "error"
           ],
           "default": "warning",
-          "description": "Unknown property."
+          "description": "Unknown property"
+        },
+        "less.lint.validProperties": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "scope": "resource",
+          "default": [],
+          "description": "A list of properties that are not validated against the `unknownProperties` rule"
         },
         "less.lint.ieHack": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "ignore"
-        },
-        "less.lint.unknownVendorSpecificProperties": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "ignore",
-          "description": "Unknown vendor specific property."
-        },
-        "less.lint.propertyIgnoredDueToDisplay": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "warning",
-          "description": "Property is ignored due to the display. E.g. with 'display: inline', the width, height, margin-top, margin-bottom, and float properties have no effect"
-        },
-        "less.lint.important": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "ignore",
-          "description": "Import statements do not load in parallel"
-        },
-        "less.lint.float": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "ignore",
-          "description": "Avoid using 'float'. Floats lead to fragile CSS that is easy to break if one aspect of the layout changes."
-        },
-        "less.lint.idSelector": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "ignore",
-          "description": "Selectors should not contain IDs because these rules are too tightly coupled with the HTML."
-        },
-        "less.lint.unknownAtRules": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "warning",
-          "description": "Unknown at-rule."
-        },
-        "scss.completion.triggerPropertyValueCompletion": {
-          "type": "boolean",
-          "scope": "resource",
-          "default": true,
-          "description": "By default, coc.nvim triggers property value completion after selecting a CSS property. Use this setting to disable this behavior."
-        },
-        "scss.completion.completePropertyWithSemicolon": {
-          "type": "boolean",
-          "scope": "resource",
-          "default": true,
-          "description": "Insert semicolon at end of line when completing CSS properties"
-        },
-        "scss.validate": {
-          "type": "boolean",
-          "scope": "resource",
-          "default": true
-        },
-        "scss.colorDecorators.enable": {
-          "type": "boolean",
-          "scope": "window",
-          "default": true
-        },
-        "scss.lint.compatibleVendorPrefixes": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "ignore"
-        },
-        "scss.lint.vendorPrefix": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "warning"
-        },
-        "scss.lint.duplicateProperties": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "ignore"
-        },
-        "scss.lint.emptyRules": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "warning"
-        },
-        "scss.lint.importStatement": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "ignore"
-        },
-        "scss.lint.boxModel": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "ignore",
-          "description": "Do not use width or height when using padding or border"
-        },
-        "scss.lint.universalSelector": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "ignore"
-        },
-        "scss.lint.zeroUnits": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "ignore"
-        },
-        "scss.lint.fontFaceProperties": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "warning"
-        },
-        "scss.lint.hexColorLength": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "error"
-        },
-        "scss.lint.argumentsInColorFunction": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "error"
-        },
-        "scss.lint.unknownProperties": {
-          "type": "string",
-          "scope": "resource",
-          "enum": [
-            "ignore",
-            "warning",
-            "error"
-          ],
-          "default": "warning"
-        },
-        "scss.lint.ieHack": {
           "type": "string",
           "scope": "resource",
           "enum": [
@@ -659,7 +747,7 @@
           "default": "ignore",
           "description": "IE hacks are only necessary when supporting IE7 and older"
         },
-        "scss.lint.unknownVendorSpecificProperties": {
+        "less.lint.unknownVendorSpecificProperties": {
           "type": "string",
           "scope": "resource",
           "enum": [
@@ -667,9 +755,10 @@
             "warning",
             "error"
           ],
-          "default": "ignore"
+          "default": "ignore",
+          "description": "Unknown vendor specific property"
         },
-        "scss.lint.propertyIgnoredDueToDisplay": {
+        "less.lint.propertyIgnoredDueToDisplay": {
           "type": "string",
           "scope": "resource",
           "enum": [
@@ -677,9 +766,10 @@
             "warning",
             "error"
           ],
-          "default": "warning"
+          "default": "warning",
+          "markdownDescription": "Property is ignored due to the display. E.g. with `display: inline`, the `width`, `height`, `margin-top`, `margin-bottom`, and `float` properties have no effect"
         },
-        "scss.lint.important": {
+        "less.lint.important": {
           "type": "string",
           "scope": "resource",
           "enum": [
@@ -687,9 +777,10 @@
             "warning",
             "error"
           ],
-          "default": "ignore"
+          "default": "ignore",
+          "markdownDescription": "Avoid using `!important`. It is an indication that the specificity of the entire CSS has gotten out of control and needs to be refactored"
         },
-        "scss.lint.float": {
+        "less.lint.float": {
           "type": "string",
           "scope": "resource",
           "enum": [
@@ -697,9 +788,10 @@
             "warning",
             "error"
           ],
-          "default": "ignore"
+          "default": "ignore",
+          "markdownDescription": "Avoid using `float`. Floats lead to fragile CSS that is easy to break if one aspect of the layout changes"
         },
-        "scss.lint.idSelector": {
+        "less.lint.idSelector": {
           "type": "string",
           "scope": "resource",
           "enum": [
@@ -707,7 +799,19 @@
             "warning",
             "error"
           ],
-          "default": "ignore"
+          "default": "ignore",
+          "description": "Selectors should not contain IDs because these rules are too tightly coupled with the HTML"
+        },
+        "less.lint.unknownAtRules": {
+          "type": "string",
+          "scope": "resource",
+          "enum": [
+            "ignore",
+            "warning",
+            "error"
+          ],
+          "default": "warning",
+          "description": "Unknown at-rule"
         },
         "wxss.validate": {
           "type": "boolean",
