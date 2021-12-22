@@ -4,28 +4,38 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { Disposable, Emitter, extensions, Uri, workspace } from 'coc.nvim'
+import { Utils } from 'vscode-uri'
 import path from 'path'
 import { resolvePath } from './requests'
 
-export function getCustomDataSource(toDispose: Disposable[]): any {
+export function getCustomDataSource(toDispose: Disposable[]) {
   let pathsInWorkspace = getCustomDataPathsInAllWorkspaces()
   let pathsInExtensions = getCustomDataPathsFromAllExtensions()
 
   const onChange = new Emitter<void>()
 
-  toDispose.push(extensions.onDidActiveExtension(_ => {
-    const newPathsInExtensions = getCustomDataPathsFromAllExtensions()
-    if (newPathsInExtensions.length !== pathsInExtensions.length || !newPathsInExtensions.every((val, idx) => val === pathsInExtensions[idx])) {
-      pathsInExtensions = newPathsInExtensions
-      onChange.fire()
-    }
-  }))
-  toDispose.push(workspace.onDidChangeConfiguration(e => {
-    if (e.affectsConfiguration('css.customData')) {
-      pathsInWorkspace = getCustomDataPathsInAllWorkspaces()
-      onChange.fire()
-    }
-  }))
+  toDispose.push(
+    extensions.onDidActiveExtension((_) => {
+      const newPathsInExtensions = getCustomDataPathsFromAllExtensions()
+      if (
+        newPathsInExtensions.length !== pathsInExtensions.length ||
+        !newPathsInExtensions.every(
+          (val, idx) => val === pathsInExtensions[idx]
+        )
+      ) {
+        pathsInExtensions = newPathsInExtensions
+        onChange.fire()
+      }
+    })
+  )
+  toDispose.push(
+    workspace.onDidChangeConfiguration((e) => {
+      if (e.affectsConfiguration('css.customData')) {
+        pathsInWorkspace = getCustomDataPathsInAllWorkspaces()
+        onChange.fire()
+      }
+    })
+  )
 
   return {
     get uris() {
@@ -66,7 +76,6 @@ function getCustomDataPathsInAllWorkspaces(): string[] {
         collect(customDataInspect.globalValue, Uri.parse(folderUri))
       }
     }
-
   }
   return dataPaths
 }
