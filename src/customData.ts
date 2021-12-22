@@ -2,11 +2,8 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-
 import { Disposable, Emitter, extensions, Uri, workspace } from 'coc.nvim'
 import { Utils } from 'vscode-uri'
-import path from 'path'
-import { resolvePath } from './requests'
 
 export function getCustomDataSource(toDispose: Disposable[]) {
   let pathsInWorkspace = getCustomDataPathsInAllWorkspaces()
@@ -19,9 +16,7 @@ export function getCustomDataSource(toDispose: Disposable[]) {
       const newPathsInExtensions = getCustomDataPathsFromAllExtensions()
       if (
         newPathsInExtensions.length !== pathsInExtensions.length ||
-        !newPathsInExtensions.every(
-          (val, idx) => val === pathsInExtensions[idx]
-        )
+        !newPathsInExtensions.every((val, idx) => val === pathsInExtensions[idx])
       ) {
         pathsInExtensions = newPathsInExtensions
         onChange.fire()
@@ -49,18 +44,15 @@ export function getCustomDataSource(toDispose: Disposable[]) {
 
 function getCustomDataPathsInAllWorkspaces(): string[] {
   const workspaceFolders = workspace.workspaceFolders
-
   const dataPaths: string[] = []
-
   if (!workspaceFolders) {
     return dataPaths
   }
-
   const collect = (paths: string[] | undefined, rootFolder: Uri) => {
     if (Array.isArray(paths)) {
       for (const path of paths) {
         if (typeof path === 'string') {
-          dataPaths.push(resolvePath(rootFolder, path).toString())
+          dataPaths.push(Utils.resolvePath(rootFolder, path).toString())
         }
       }
     }
@@ -86,7 +78,8 @@ function getCustomDataPathsFromAllExtensions(): string[] {
     const customData = extension.packageJSON?.contributes?.css?.customData
     if (Array.isArray(customData)) {
       for (const rp of customData) {
-        dataPaths.push(path.join(extension.extensionPath, rp).toString())
+        const uri = Uri.file(extension.extensionPath)
+        dataPaths.push(Utils.joinPath(uri, rp).toString())
       }
     }
   }
