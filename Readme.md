@@ -4,6 +4,11 @@ Css language server extension for [coc.nvim](https://github.com/neoclide/coc.nvi
 
 Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice) inside.
 
+**Note**: words are exetracted by `iskeyword` option of buffer, you may want to
+adjust it by command like:
+
+    autocmd FileType css setl iskeyword+=-
+
 ## Install
 
 In your vim/neovim, run the command:
