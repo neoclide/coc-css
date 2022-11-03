@@ -11,26 +11,20 @@ export function getCustomDataSource(toDispose: Disposable[]) {
 
   const onChange = new Emitter<void>()
 
-  toDispose.push(
-    extensions.onDidActiveExtension((_) => {
-      const newPathsInExtensions = getCustomDataPathsFromAllExtensions()
-      if (
-        newPathsInExtensions.length !== pathsInExtensions.length ||
-        !newPathsInExtensions.every((val, idx) => val === pathsInExtensions[idx])
-      ) {
-        pathsInExtensions = newPathsInExtensions
-        onChange.fire()
-      }
-    })
-  )
-  toDispose.push(
-    workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration('css.customData')) {
-        pathsInWorkspace = getCustomDataPathsInAllWorkspaces()
-        onChange.fire()
-      }
-    })
-  )
+  toDispose.push(extensions.onDidLoadExtension(_ => {
+    const newPathsInExtensions = getCustomDataPathsFromAllExtensions()
+    if (newPathsInExtensions.length !== pathsInExtensions.length || !newPathsInExtensions.every((val, idx) => val === pathsInExtensions[idx])) {
+      pathsInExtensions = newPathsInExtensions
+      onChange.fire()
+    }
+  }))
+
+  toDispose.push(workspace.onDidChangeConfiguration(e => {
+    if (e.affectsConfiguration('css.customData')) {
+      pathsInWorkspace = getCustomDataPathsInAllWorkspaces()
+      onChange.fire()
+    }
+  }))
 
   return {
     get uris() {
@@ -42,12 +36,16 @@ export function getCustomDataSource(toDispose: Disposable[]) {
   }
 }
 
+
 function getCustomDataPathsInAllWorkspaces(): string[] {
   const workspaceFolders = workspace.workspaceFolders
+
   const dataPaths: string[] = []
+
   if (!workspaceFolders) {
     return dataPaths
   }
+
   const collect = (paths: string[] | undefined, rootFolder: Uri) => {
     if (Array.isArray(paths)) {
       for (const path of paths) {
@@ -59,15 +57,19 @@ function getCustomDataPathsInAllWorkspaces(): string[] {
   }
 
   for (let i = 0; i < workspaceFolders.length; i++) {
-    const folderUri = workspaceFolders[i].uri
+    const folderUri = Uri.parse(workspaceFolders[i].uri)
     const allCssConfig = workspace.getConfiguration('css', folderUri)
     const customDataInspect = allCssConfig.inspect<string[]>('customData')
     if (customDataInspect) {
-      collect(customDataInspect.workspaceValue, Uri.parse(folderUri))
+      collect(customDataInspect.workspaceFolderValue, folderUri)
       if (i === 0) {
-        collect(customDataInspect.globalValue, Uri.parse(folderUri))
+        // if (workspace.workspaceFile) {
+        //   collect(customDataInspect.workspaceValue, workspace.workspaceFile)
+        // }
+        collect(customDataInspect.globalValue, folderUri)
       }
     }
+
   }
   return dataPaths
 }

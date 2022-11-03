@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.33.tgz#8c29a0036771569662e4635790ffa9e057db379b"
   integrity sha512-qelS/Ra6sacc4loe/3MSjXNL1dNQ/GjxNHVzuChwMfmk7HuycRLVQN2qNY3XahK+fZc5E2szqQSKUyAF0E+2bg==
 
-coc.nvim@0.0.81-next.8:
-  version "0.0.81-next.8"
-  resolved "https://registry.yarnpkg.com/coc.nvim/-/coc.nvim-0.0.81-next.8.tgz#7c0ec46cfab29d41ebdb9e3e9cabf1cb5cc2b920"
-  integrity sha512-1dk2j571Gxk4lXw2GVdGfOJeZAhfZ5HgmtA/p4NW5gorNVnCcC6qe2sp0LiecgiWfah3o+BsOTahr+Vjwj6GYA==
+coc.nvim@0.0.83-next.8:
+  version "0.0.83-next.8"
+  resolved "https://registry.yarnpkg.com/coc.nvim/-/coc.nvim-0.0.83-next.8.tgz#98478b703d70de0941731e0b1fdac4c0f9fe5f44"
+  integrity sha512-ngYyjDnrMfQTffHQeEyvWoLCKEMTx+Z/7GSphyzQ/b3+l0jDHfZJY0lt3e+Vl53og8Ylpa9rF32zjVUmztmxYQ==
 
 esbuild-android-arm64@0.14.7:
   version "0.14.7"
@@ -135,6 +135,11 @@ vscode-css-languageservice@^6.1.1:
     vscode-nls "^5.2.0"
     vscode-uri "^3.0.4"
 
+vscode-jsonrpc@8.0.2:
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/vscode-jsonrpc/-/vscode-jsonrpc-8.0.2.tgz#f239ed2cd6004021b6550af9fd9d3e47eee3cac9"
+  integrity sha512-RY7HwI/ydoC1Wwg4gJ3y6LpU9FJRZAUnTYMXthqhFXXu77ErDd/xkREpGuk4MyYkk4a+XDWAMqe0S3KkelYQEQ==
+
 vscode-jsonrpc@8.1.0-next.1:
   version "8.1.0-next.1"
   resolved "https://registry.yarnpkg.com/vscode-jsonrpc/-/vscode-jsonrpc-8.1.0-next.1.tgz#7c38cb1cbd968c409522593004fdac845a55b155"
@@ -146,6 +151,14 @@ vscode-languageserver-protocol@3.17.3-next.1:
   integrity sha512-vgjvPE0zox+1Fi4ljsSFJ+B3g8wGNbuAEEdulueVdv+R2VHtc06+dgxhWiG4LKPqXwjPDmiuxCnvd2xk3fzTTw==
   dependencies:
     vscode-jsonrpc "8.1.0-next.1"
+    vscode-languageserver-types "3.17.2"
+
+vscode-languageserver-protocol@^3.17.2:
+  version "3.17.2"
+  resolved "https://registry.yarnpkg.com/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.17.2.tgz#beaa46aea06ed061576586c5e11368a9afc1d378"
+  integrity sha512-8kYisQ3z/SQ2kyjlNeQxbkkTNmVFoQCqkmGrzLH6A9ecPlgTbp3wDTnUNqaUxYr4vlAcloxx8zwy7G5WdguYNg==
+  dependencies:
+    vscode-jsonrpc "8.0.2"
     vscode-languageserver-types "3.17.2"
 
 vscode-languageserver-textdocument@^1.0.7:
