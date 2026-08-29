@@ -6,6 +6,7 @@
   "files": [
     "lib/index.js",
     "lib/server.js",
+    "images/logo.png",
     "schemas/package.schema.json",
     "history.md"
   ],
