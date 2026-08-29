@@ -1,0 +1,255 @@
+name: Daily release
+
+on:
+  schedule:
+    # GitHub Actions cron uses UTC. Run daily away from the top of the hour.
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  # npm Trusted Publishing exchanges this GitHub OIDC identity for a
+  # short-lived publish credential. Do not add an npm token secret.
+  id-token: write
+
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Check out master
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: master
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Set up npm for Trusted Publishing
+        # Trusted Publishing requires npm >= 11.5.1 and Node >= 22.14.0.
+        run: npm install --global npm@11.19.1
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install editors
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y neovim vim
+
+      - name: Download coc.nvim release branch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          archive="$(mktemp "${RUNNER_TEMP}/coc.nvim.release.tar.gz.XXXXXX")"
+          coc_path="$(mktemp -d "${RUNNER_TEMP}/coc.nvim.release.XXXXXX")"
+          trap 'rm -f "$archive"' EXIT
+
+          curl --fail --location --retry 3 \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer ${GITHUB_TOKEN}" \
+            --header "X-GitHub-Api-Version: 2026-03-10" \
+            --output "$archive" \
+            https://api.github.com/repos/neoclide/coc.nvim/tarball/release
+          tar -xzf "$archive" --strip-components=1 -C "$coc_path"
+          printf 'COC_TEST_COC_PATH=%s\n' "$coc_path" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm run test
+
+      - name: Plan release
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          package_name="$(node -p "require('./package.json').name")"
+          current_version="$(node -p "require('./package.json').version")"
+          if [[ ! "$current_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::package.json version ${current_version} is not a stable SemVer version"
+            exit 1
+          fi
+
+          # Select the newest reachable stable SemVer tag while preserving its
+          # original bare or v-prefixed name for subsequent git operations.
+          previous_tag="$({
+            while IFS= read -r tag; do
+              version="${tag#v}"
+              if [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                printf '%s\t%s\n' "$version" "$tag"
+              fi
+            done < <(git tag --list)
+          } | sort -V -k1,1 | tail -n 1 | cut -f2-)"
+          if [[ -z "$previous_tag" ]]; then
+            echo "::error::No SemVer release tag found; create the baseline release tag before running this workflow"
+            exit 1
+          fi
+          previous_version="${previous_tag#v}"
+
+          if ! git merge-base --is-ancestor "$previous_tag" HEAD; then
+            echo "::error::Release tag ${previous_tag} is not an ancestor of HEAD"
+            exit 1
+          fi
+
+          published=false
+          if npm view "${package_name}@${current_version}" version --json >/dev/null 2>&1; then
+            published=true
+          fi
+
+          if [[ "$current_version" != "$previous_version" ]]; then
+            if [[ "$(printf '%s\n%s\n' "$current_version" "$previous_version" | sort -V | tail -n 1)" != "$current_version" ]]; then
+              echo "::error::package.json version ${current_version} is older than latest release tag ${previous_tag}"
+              exit 1
+            fi
+            if git rev-parse --verify --quiet "refs/tags/${current_version}^{commit}" >/dev/null || \
+               git rev-parse --verify --quiet "refs/tags/v${current_version}^{commit}" >/dev/null; then
+              echo "::error::Release tag for ${current_version} already exists; inspect remote branch/tag divergence"
+              exit 1
+            fi
+            if [[ "$published" == "true" ]]; then
+              echo "::error::npm already has ${package_name}@${current_version}, but no matching release tag exists"
+              exit 1
+            fi
+            echo "Manifest version ${current_version} is newer than tag ${previous_tag}; releasing it directly."
+            echo "mode=release" >> "$GITHUB_OUTPUT"
+            echo "version=${current_version}" >> "$GITHUB_OUTPUT"
+            echo "previous_tag=${previous_tag}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          commit_count="$(git rev-list --count "${previous_tag}..HEAD")"
+          if [[ "$commit_count" == "0" ]]; then
+            if [[ "$published" == "true" ]]; then
+              echo "No commits since ${previous_tag}; nothing to release."
+              echo "mode=skip" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            echo "Git release ${current_version} exists but npm does not have it; retrying publication only."
+            echo "mode=publish-only" >> "$GITHUB_OUTPUT"
+            echo "version=${current_version}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          published_version="$(npm view "$package_name" version)"
+          if [[ "$published_version" != "$current_version" ]]; then
+            echo "::error::package.json version ${current_version} does not match npm latest ${published_version}"
+            exit 1
+          fi
+          echo "mode=release" >> "$GITHUB_OUTPUT"
+          echo "previous_tag=${previous_tag}" >> "$GITHUB_OUTPUT"
+
+      - name: Update version and history
+        if: steps.release.outputs.mode == 'release'
+        id: prepare
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          previous_tag="${{ steps.release.outputs.previous_tag }}"
+          if [[ -n "${{ steps.release.outputs.version }}" ]]; then
+            # A maintainer already bumped package.json; release that exact
+            # version without incrementing it again.
+            version="${{ steps.release.outputs.version }}"
+          else
+            version="$(npm version patch --no-git-tag-version)"
+          fi
+          version="${version#v}"
+
+          if git rev-parse --verify --quiet "refs/tags/${version}^{commit}" >/dev/null || \
+             git rev-parse --verify --quiet "refs/tags/v${version}^{commit}" >/dev/null; then
+            echo "::error::Release tag for ${version} already exists; inspect remote branch/tag divergence"
+            exit 1
+          fi
+
+          release_notes="$(mktemp)"
+          updated_history="$(mktemp)"
+          git log --format='- %s (%h)' "${previous_tag}..HEAD" > "$release_notes"
+
+          # Preserve the repository's "## vX.Y.Z YYYY-MM-DD" format. If a
+          # manual bump already created the section, add commit bullets to that
+          # section instead of creating a duplicate heading.
+          heading_pattern="^## v?${version}([[:space:]]|$)"
+          heading_count="$(grep -Ec "$heading_pattern" history.md || true)"
+          if (( heading_count > 1 )); then
+            echo "::error::history.md contains multiple sections for ${version}"
+            exit 1
+          elif (( heading_count == 1 )); then
+            heading_line="$(grep -En "$heading_pattern" history.md | cut -d: -f1)"
+            head -n "$heading_line" history.md > "$updated_history"
+            printf '\n' >> "$updated_history"
+            cat "$release_notes" >> "$updated_history"
+            tail -n "+$((heading_line + 1))" history.md >> "$updated_history"
+          else
+            {
+              printf '## v%s %s\n\n' "$version" "$(date -u +%F)"
+              cat "$release_notes"
+              if [[ -s history.md ]]; then
+                printf '\n'
+                cat history.md
+              fi
+            } > "$updated_history"
+          fi
+          mv "$updated_history" history.md
+
+          npm pack --dry-run
+
+          untracked="$(git ls-files --others --exclude-standard)"
+          if [[ -n "$untracked" ]]; then
+            echo "::error::git commit -a would omit untracked files:"
+            printf '%s\n' "$untracked"
+            exit 1
+          fi
+
+          unexpected_tracked="$(git diff --name-only | grep -Ev '^(history\.md|package\.json|package-lock\.json)$' || true)"
+          if [[ -n "$unexpected_tracked" ]]; then
+            echo "::error::Release preparation changed unexpected tracked files:"
+            printf '%s\n' "$unexpected_tracked"
+            exit 1
+          fi
+
+          git diff --check
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Commit, tag, and push
+        if: steps.release.outputs.mode == 'release'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          version="${{ steps.prepare.outputs.version }}"
+          source_head="$(git rev-parse HEAD)"
+          git fetch --quiet origin master
+          remote_head="$(git rev-parse FETCH_HEAD)"
+          if [[ "$remote_head" != "$source_head" ]]; then
+            echo "::error::master advanced during this run; retry from ${remote_head}"
+            exit 1
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -a -m "Release $version"
+          git tag -a "$version" -m "Release $version"
+          git push --tags
+          git push
+
+      - name: Publish to npm
+        if: steps.release.outputs.mode == 'release' || steps.release.outputs.mode == 'publish-only'
+        # Authentication is provided exclusively by npm Trusted Publishing
+        # through GitHub OIDC; do not add NODE_AUTH_TOKEN or another npm token.
+        run: npm publish
