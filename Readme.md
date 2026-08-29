@@ -1,7 +1,7 @@
 # coc-css
 
 <p align="center">
-  <img src="images/logo.png" width="160" alt="coc-css logo">
+  <img src="assets/logo.png" width="160" alt="coc-css logo">
 </p>
 
 [![CI](https://github.com/neoclide/coc-css/actions/workflows/ci.yml/badge.svg)](https://github.com/neoclide/coc-css/actions/workflows/ci.yml)
