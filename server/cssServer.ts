@@ -7,7 +7,7 @@ import {
 	Connection, TextDocuments, InitializeParams, InitializeResult, ServerCapabilities, ConfigurationRequest, WorkspaceFolder, TextDocumentSyncKind, NotificationType, Disposable, TextDocumentIdentifier, Range, FormattingOptions, TextEdit, Diagnostic
 } from 'vscode-languageserver';
 import { URI } from 'vscode-uri';
-import { getCSSLanguageService, getSCSSLanguageService, getLESSLanguageService, LanguageSettings, LanguageService, Stylesheet, TextDocument, Position } from 'vscode-css-languageservice';
+import { getCSSLanguageService, getSCSSLanguageService, getLESSLanguageService, LanguageSettings, LanguageService, Stylesheet, TextDocument, Position, CodeActionKind } from 'vscode-css-languageservice';
 import { getLanguageModelCache } from './languageModelCache';
 import { runSafeAsync } from './utils/runner';
 import { DiagnosticsSupport, registerDiagnosticsPullSupport, registerDiagnosticsPushSupport } from './utils/validation';
@@ -56,6 +56,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 	let formatterMaxNumberOfEdits = Number.MAX_VALUE;
 
 	let dataProvidersReady: Promise<any> = Promise.resolve();
+	let dataProvidersVersion = 0;
 
 	let diagnosticsSupport: DiagnosticsSupport | undefined;
 
@@ -119,7 +120,9 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 			documentLinkProvider: {
 				resolveProvider: false
 			},
-			codeActionProvider: true,
+			codeActionProvider: {
+				codeActionKinds: [CodeActionKind.QuickFix]
+			},
 			renameProvider: true,
 			colorProvider: {},
 			foldingRangeProvider: true,
@@ -185,7 +188,11 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 	}
 
 	function updateDataProviders(dataPaths: string[]) {
+		const version = ++dataProvidersVersion;
 		dataProvidersReady = fetchDataProviders(dataPaths, requestService).then(customDataProviders => {
+			if (version !== dataProvidersVersion) {
+				return;
+			}
 			for (const lang in languageServices) {
 				languageServices[lang].setDataProviders(true, customDataProviders);
 			}
@@ -286,7 +293,7 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 			if (document) {
 				await dataProvidersReady;
 				const stylesheet = stylesheets.get(document);
-				return getLanguageService(document).doCodeActions(document, codeActionParams.range, codeActionParams.context, stylesheet);
+				return getLanguageService(document).doCodeActions2(document, codeActionParams.range, codeActionParams.context, stylesheet);
 			}
 			return [];
 		}, [], `Error while computing code actions for ${codeActionParams.textDocument.uri}`, token);
@@ -384,6 +391,3 @@ export function startServer(connection: Connection, runtime: RuntimeEnvironment)
 function getFullRange(document: TextDocument): Range {
 	return Range.create(Position.create(0, 0), document.positionAt(document.getText().length));
 }
-
-
-

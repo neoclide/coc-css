@@ -1,4 +1,4 @@
-import { ExtensionContext, languages, NotificationType, LanguageClient, LanguageClientOptions, ServerOptions, services, TransportKind, workspace, ServiceStat, Disposable, TextDocument, Range, FormattingOptions, CancellationToken, ProviderResult, TextEdit, commands, window } from 'coc.nvim'
+import { ExtensionContext, languages, NotificationType, LanguageClient, LanguageClientOptions, ServerOptions, services, TransportKind, workspace, ClientState, Disposable, TextDocument, Range, FormattingOptions, CancellationToken, ProviderResult, TextEdit } from 'coc.nvim'
 import { getCustomDataSource } from './customData'
 import { RequestService, serveFileSystemRequests } from './requests'
 import { TextDecoder } from 'util'
@@ -76,7 +76,7 @@ export async function activate(context: ExtensionContext): Promise<void> {
 
   await client.start()
 
-  if (client.serviceState === ServiceStat.Running) {
+  if (client.serviceState === ClientState.Running) {
     client.sendNotification(CustomDataChangedNotification.type, customDataSource.uris)
     customDataSource.onDidChange(() => {
       client.sendNotification(CustomDataChangedNotification.type, customDataSource.uris)
@@ -94,21 +94,6 @@ export async function activate(context: ExtensionContext): Promise<void> {
     context.subscriptions.push(workspace.onDidChangeConfiguration(e => e.affectsConfiguration(registration.settingId) && updateFormatterRegistration(registration)))
   }
   serveFileSystemRequests(client, runtime)
-
-  commands.registerCommand('_css.applyCodeAction', applyCodeAction)
-
-  function applyCodeAction(uri: string, documentVersion: number, edits: TextEdit[]) {
-    const textEditor = window.activeTextEditor
-    if (textEditor && textEditor.document.uri.toString() === uri) {
-      if (textEditor.document.version !== documentVersion) {
-        window.showInformationMessage(`CSS fix is outdated and can't be applied to the document.`)
-      }
-      textEditor.document.applyEdits(edits).catch(err => {
-        window.showErrorMessage(`Failed to apply CSS fix to the document. ${err.message}`)
-      })
-    }
-  }
-
 
   function updateFormatterRegistration(registration: FormatterRegistration) {
     const formatEnabled = workspace.getConfiguration().get(registration.settingId)

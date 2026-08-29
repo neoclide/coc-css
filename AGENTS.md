@@ -1,5 +1,7 @@
 # coc-css repository guide
 
+Upstrem files location: /Users/chemzqm/lib/vscode/extensions/css-language-features
+
 The project skills under `.codex/skills` define the workflows for issue work,
 audits, tests, upstream synchronization, and releases. Do not duplicate those
 workflows here; this file contains only repository-specific constraints.
@@ -43,8 +45,8 @@ workflows here; this file contains only repository-specific constraints.
 
 ## Local validation facts
 
-- `yarn.lock` is the tracked dependency lockfile; do not replace or rewrite it
-  with another package manager unless dependency management is the task.
+- `package-lock.json` is the tracked dependency lockfile; use npm for dependency
+  changes and do not generate lockfiles from another package manager.
 - The repository currently defines only `build` and `prepare` scripts. Run
-  `yarn build` after source or build-configuration changes, and always run
+  `npm run build` after source or build-configuration changes, and always run
   `git diff --check` before handing off a change.

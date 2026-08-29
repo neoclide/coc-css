@@ -1,11 +1,18 @@
 {
   "name": "coc-css",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Css extension for coc.nvim",
   "main": "lib/index.js",
+  "files": [
+    "lib/index.js",
+    "lib/server.js",
+    "schemas/package.schema.json",
+    "history.md"
+  ],
   "publisher": "chemzqm",
   "engines": {
-    "coc": "^0.0.82"
+    "coc": "^0.0.82",
+    "node": ">=22"
   },
   "keywords": [
     "coc.nvim",
@@ -14,7 +21,13 @@
   ],
   "scripts": {
     "build": "node esbuild.js",
-    "prepare": "node esbuild.js"
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "prepare": "node esbuild.js",
+    "test": "npm run test:unit && npm run test:integration:nvim && npm run test:integration:vim",
+    "test:unit": "node --test test/customData.unit.test.js",
+    "test:integration": "npm run build && coc-test \"test/**/*.test.ts\"",
+    "test:integration:nvim": "npm run build && coc-test --nvim \"test/**/*.test.ts\"",
+    "test:integration:vim": "npm run build && coc-test --vim \"test/**/*.test.ts\""
   },
   "activationEvents": [
     "onLanguage:css",
@@ -964,14 +977,17 @@
   "author": "chemzqm@gmail.com",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^14.14",
-    "coc.nvim": "0.0.83-next.8",
-    "esbuild": "^0.14.7",
-    "typescript": "^4",
-    "vscode-css-languageservice": "^6.2.7",
-    "vscode-languageserver": "^8.2.0-next.3",
-    "vscode-languageserver-protocol": "^3.17.2",
-    "vscode-uri": "^3.0.7"
+    "@types/node": "^22.20",
+    "coc-test": "^0.2.0",
+    "coc.nvim": "0.0.83-next.26",
+    "esbuild": "^0.28.0",
+    "typescript": "^6.0.3",
+    "vscode-css-languageservice": "^6.3.10",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-protocol": "^3.17.5",
+    "vscode-uri": "^3.1.0"
   },
-  "dependencies": {}
+  "coc-test": {
+    "entryFile": "src/index.ts"
+  }
 }

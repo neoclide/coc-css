@@ -1,5 +1,7 @@
 # coc-css
 
+[![CI](https://github.com/neoclide/coc-css/actions/workflows/ci.yml/badge.svg)](https://github.com/neoclide/coc-css/actions/workflows/ci.yml)
+
 Css language server extension for [coc.nvim](https://github.com/neoclide/coc.nvim).
 
 Uses [vscode-css-languageservice](https://github.com/Microsoft/vscode-css-languageservice) inside.
@@ -12,6 +14,8 @@ adjust it by command like:
 **Note** configuration `css.enable` and wxss support removed from 2.0.0.
 
 ## Install
+
+Requires Node.js 22 or later.
 
 In your vim/neovim, run the command:
 
