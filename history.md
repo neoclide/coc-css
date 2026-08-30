@@ -1,3 +1,7 @@
+## v2.2.1 2026-08-30
+
+- add release.yml (d68e720)
+
 ## v2.2.0 2026-08-29
 
 - Require Node.js 22 and update the CSS language service and LSP dependencies.
