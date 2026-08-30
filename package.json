@@ -10,6 +10,10 @@
     "schemas/package.schema.json",
     "history.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/neoclide/coc-css.git"
+  },
   "publisher": "chemzqm",
   "engines": {
     "coc": "^0.0.82",
