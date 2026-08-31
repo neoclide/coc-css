@@ -1,3 +1,7 @@
+## v2.2.2 2026-08-31
+
+- fix repository not exists (639ab75)
+
 ## v2.2.1 2026-08-30
 
 - add release.yml (d68e720)
