@@ -1,3 +1,9 @@
+## v2.2.3 2026-10-03
+
+- Merge pull request #45 from neoclide/codex/upstream-sync-20261003 (70317c5)
+- docs: clarify local upstream baseline provenance (af7355a)
+- docs: review VS Code CSS upstream through 67cb2a17e24 (7464734)
+
 ## v2.2.2 2026-08-31
 
 - fix repository not exists (639ab75)
