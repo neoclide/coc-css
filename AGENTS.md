@@ -50,3 +50,11 @@ workflows here; this file contains only repository-specific constraints.
 - The repository currently defines only `build` and `prepare` scripts. Run
   `npm run build` after source or build-configuration changes, and always run
   `git diff --check` before handing off a change.
+
+## Authorized maintenance branch delivery
+
+After the applicable tests pass and the final diff is confirmed to contain only
+the requested task changes, commit and push the verified remote work branch
+without asking for confirmation again. Preserve unrelated local work. Never
+force push. This does not authorize merging into the default branch, publishing
+to npm, or changing credentials or repository permissions.
