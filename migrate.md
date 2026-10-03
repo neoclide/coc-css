@@ -3,9 +3,12 @@
 ## 2026-10-03
 
 Reviewed `microsoft/vscode` `extensions/css-language-features` from
-`d43a612ad8121ff1f7fe19a5ee13e237c3c5463c` (the previously synchronized
-revision recorded in `.codex/coc-workflow.md`) to
+`d43a612ad8121ff1f7fe19a5ee13e237c3c5463c` to
 `67cb2a17e24d903be7d50486a70d9bd835e95ad6`.
+
+The starting revision comes from a pre-existing local synchronization record
+on the maintainer's machine. That record is not tracked in this repository;
+this ledger does not present it as a publicly verifiable repository document.
 
 No runtime changes were applied:
 
