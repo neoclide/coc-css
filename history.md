@@ -1,3 +1,8 @@
+## v2.2.4 2026-10-04
+
+- Merge pull request #46 from neoclide/codex/upstream-sync-20261003 (58fe612)
+- update coc-css (5b0e605)
+
 ## v2.2.3 2026-10-03
 
 - Merge pull request #45 from neoclide/codex/upstream-sync-20261003 (70317c5)
